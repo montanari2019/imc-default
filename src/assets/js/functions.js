@@ -85,19 +85,18 @@ function addlocalStorage(nome, peso, altura, imc){
 
 // Função para pegar os dados do localStorage e colocalos na tabela 
 function carregarLocalStorage(){
-   limparTabela()
+  
+  limparTabela();
 
-   let listaIMC = JSON.parse(localStorage.getItem("listaIMC"))
-
-   if(localStorage.getItem("listaIMC")){
-      listaIMC.forEach((pessoa, indice ) => {
-        addTabela(pessoa.nome, pessoa.peso, pessoa.altura, pessoa.imc.toFixed(2), indice)
-      });
-    }else{
-
-       mostrarMensagens("Nenhum IMC a ser exebido","table")
-    }
+  if (localStorage.getItem("listaIMC")){
+    
+    let listaIMC = JSON.parse(localStorage.getItem("listaIMC"));
+    listaIMC.forEach((pessoa, indice) => {
+      addTabela(pessoa.nome, pessoa.peso, pessoa.altura, pessoa.imc, indice);
+    });
+  }
 }
+
 
 // Função para Limpar a tabela
 function limparTabela(){
@@ -163,13 +162,13 @@ function mostrarMensagens(msg, tipo){
 
 
 // Função qUe exibe o resultado do IMC 
-function resultadoIMC(imc){
+// function resultadoIMC(imc){
   
-  if(imc < 18.5){
+//   if(imc < 18.5){
     
-  }
+//   }
 
-}
+// }
 
 
 
@@ -183,7 +182,7 @@ document.querySelector("#btn-calcular").addEventListener("click", () => {
 
   addlocalStorage(nome.value, peso.value, altura.value, imc)
   
-  carregarLocalStorage();
+  carregarLocalStorage()
 
   limparFormulario()
 
