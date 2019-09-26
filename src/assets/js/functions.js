@@ -1,60 +1,65 @@
-let nome = document.querySelector("#nome");
-let peso = document.querySelector("#peso");
+let nome = document.querySelector("#nome")
+
+let peso = document.querySelector("#peso")
+
 let altura = document.querySelector("#altura")
 
-function calcularIMC(peso,altura){
-  return peso / (altura * altura)
-}
+let tabela =  document.querySelector('.table')
 
-let tabela = document.querySelector(".table");
-function addTabela(nome, altura, imc, peso, indice){
- 
-  let colunaNome = document.createElement('td');
-  colunaNome.innerHTML = nome;
+let mensagem = document.querySelector('#mensagem')
 
-  let colunaPeso = document.createElement('td');
-  colunaPeso.innerHTML = peso;
 
-  let colunaAltura = document.createElement('td');
-  colunaAltura.innerHTML = altura;
-  
-  let colunaIMC = document.createElement('td');
-  colunaIMC.innerHTML = imc;
+// Função para preencher a tabela
+function addTabela(nome, peso, altura, imc, indice){
 
-  let colunaDeletar = document.createElement('td');
-  let bttnDeletar = document.createElement('td');
-  bttnDeletar.innerHTML = "<img src = 'assets/images/delete.svg'>";
-  bttnDeletar.classList.add('btn');
-  bttnDeletar.classList.add('btn-danger');
-  colunaDeletar.appendChild(bttnDeletar);
+  // Mapeando os dados 
+  let colunaNome = document.createElement('td')
+  colunaNome.innerHTML = nome
 
-  //Listerner para deletar
-  bttnDeletar.addEventListener("click", (event) =>{
+  let colunaPeso = document.createElement('td')
+  colunaPeso.innerHTML = peso
 
-    event.preventDefault();
-    deletarLinha(indice);
+  let colunaAltura = document.createElement('td')
+  colunaAltura.innerHTML = altura
 
-  });
+  let colunaImc = document.createElement('td')
+  colunaImc.innerHTML = imc
+
+  // let colunaResultado = document.createElement('td')
+  // colunaResultado.innerHTML = resultado
+
+  let colunaDeletar = document.createElement('td')
+
+  let btnDeletar = document.createElement('button')
+  btnDeletar.innerHTML = '<img src = "assets/images/delete.svg" alt = "Deletar IMC">'
+  btnDeletar.classList.add('btn')
+  btnDeletar.classList.add('btn-danger')
+
+
+  btnDeletar.addEventListener("click", () =>{
+    event.preventDefault()
+    deletarLinha(indice)
+  })
+
+  colunaDeletar.appendChild(btnDeletar)
+
 
   let linha = document.createElement('tr');
+
+  // inserindo nas colunas da tabelas os respectivos dados
   linha.appendChild(colunaNome);
   linha.appendChild(colunaPeso);
   linha.appendChild(colunaAltura);
-  linha.appendChild(colunaIMC);
-  linha.appendChild(colunaDeletar);  
+  linha.appendChild(colunaImc);
+  // linha.appendChild(colunaResultado);
+  linha.appendChild(colunaDeletar);
 
   tabela.appendChild(linha);
 }
 
-function limparCampos(){
-  nome.value = "";
-  peso.value = "";
-  altura.value = "";
-  nome.focus();
-}
+// Função para Armazenar dados no localStorage
+function addlocalStorage(nome, peso, altura, imc){
 
-function addLocalStorage(nome, peso, altura, imc){
-  
   let pessoa = {
     "nome": nome,
     "peso": peso,
@@ -63,98 +68,127 @@ function addLocalStorage(nome, peso, altura, imc){
   }
 
   if(localStorage.getItem("listaIMC")){
-    let listaIMC = JSON.parse(localStorage.getItem("listaIMC"));
-    listaIMC.push(pessoa);
-    localStorage.setItem("listaIMC", JSON.stringify(listaIMC));
-  }else{
-    let listaIMC = [];
-    listaIMC.push(pessoa);
-    localStorage.setItem("listaIMC", JSON.stringify(listaIMC));
+    
+    let listaIMC = JSON.parse(localStorage.getItem("listaIMC"))
+    listaIMC.push(pessoa)
+    localStorage.setItem("listaIMC", JSON.stringify(listaIMC))
+  
+  } else{
+    let listaIMC = []
+    listaIMC.push(pessoa)
+    localStorage.setItem("listaIMC", JSON.stringify(listaIMC))
   }
-  mostrarMensagem('Imc Castrado', 'add' );
- 
+
+  mostrarMensagens("IMC Adicionado", "add")
 }
 
+
+// Função para pegar os dados do localStorage e colocalos na tabela 
+function carregarLocalStorage(){
+   limparTabela()
+
+   let listaIMC = JSON.parse(localStorage.getItem("listaIMC"))
+
+   if(localStorage.getItem("listaIMC")){
+      listaIMC.forEach((pessoa, indice ) => {
+        addTabela(pessoa.nome, pessoa.peso, pessoa.altura, pessoa.imc.toFixed(2), indice)
+      });
+    }else{
+
+       mostrarMensagens("Nenhum IMC a ser exebido","table")
+    }
+}
+
+// Função para Limpar a tabela
 function limparTabela(){
-  let qtdLinhas = tabela.rows.length;
-  for(let i = qtdLinhas - 1; i>0; i--){
-    tabela.deleteRow(i);
+  let qtsLinhas =  tabela.rows.length
+  
+  for(let i = qtsLinhas -1 ; i > 0; i --){
+    tabela.deleteRow(i)
   }
 }
 
+// Função para Limpar o Formulário
+function limparFormulario(){
+  nome.value = ""
+  peso.value = ""
+  altura.value = ""
 
+  nome.focus()
 
-function carregarStorage(){
-
-  limparTabela();
-
-  if(localStorage.getItem("listaIMC")){
-    let listaIMC = JSON.parse(localStorage.getItem("listaIMC"));
-    listaIMC.forEach((pessoa, indice) => {
-      addTabela(pessoa.nome, pessoa.peso, pessoa.altura, pessoa.imc,indice);
-    });
-  }
-}
-
-function deletarLinha(indice){
-  let pessoas = JSON.parse(localStorage.getItem("listaIMC"));
-  pessoas.splice(indice, 1);
-  localStorage.setItem("listaIMC" , JSON.stringify(pessoas));
-  carregarStorage();
-  mostrarMensagem("Imc Deletado", "delete");
 }
 
 
-let mensagem = document.querySelector("#mensagem");
-function mostrarMensagem(msg, tipo){
-  mensagem.innerHTML = msg;
-  mensagem.classList.remove('d-none');
+// Função de deletar com botão
+function deletarLinha(index){
+  let pessoas = JSON.parse(localStorage.getItem("listaIMC"))
+  pessoas.splice(index, 1);
+
+  localStorage.setItem("listaIMC", JSON.stringify(pessoas))
+  carregarLocalStorage()
+
+  mostrarMensagens("IMC Deletado com Sucesso", "delete")
+}
+
+
+// Funçõ de calcular o imc
+function calcularIMC(peso, altura){
+  return peso / (altura * altura)
+}
+
+// Função de mostrar mensagens
+function mostrarMensagens(msg, tipo){
+
+  mensagem.innerHTML = msg
+  mensagem.classList.add("d-block")
 
   if(tipo == 'add'){
-    mensagem.classList.add('alert-success');
-  }else if (tipo == 'delete'){
-    mensagem.classList.add('alert-danger');
+    mensagem.classList.add("alert-success")
+  }else if(tipo == 'delete'){
+    mensagem.classList.add("alert-danger")
+  }else if(tipo == 'table'){
+    mensagem.classList.add('alert-warning')
   }
+
+
+  setTimeout(() => {
+    mensagem.innerHTML = ""
+    mensagem.classList.remove("alert-danger");
+    mensagem.classList.remove("alert-success");
+    mensagem.classList.remove("alert-warning");
+    mensagem.classList.remove("d-none");
+
+  }, 2000);
 }
 
+
+// Função qUe exibe o resultado do IMC 
+function resultadoIMC(imc){
   
+  if(imc < 18.5){
+    
+  }
 
-setTimeout(() =>{
-  mensagem.innerHTML = "";
-  mensagem.classList.remove('alert-success');
-  mensagem.classList.remove('alert-danger');
-  mensagem.classList.add('d-none');
-},2000);
+}
 
-document.querySelector("#btn-calcular").addEventListener("click",(event) => {
 
+
+// Fezendo Click do Botão
+document.querySelector("#btn-calcular").addEventListener("click", () => {
+
+  // Essa função abaixo serve para não recarregar a pagina quando o botão for clicado
   event.preventDefault();
-  let imc = calcularIMC(peso.value, altura.value);
+
+  let imc = calcularIMC(peso.value, altura.value)
+
+  addlocalStorage(nome.value, peso.value, altura.value, imc)
   
-  // addTabela(nome.value,altura.value,imc.toFixed(2),peso.value);
-  addLocalStorage(nome.value, peso.value, altura.value, imc.toFixed(2));
-  carregarStorage();
-  
- 
-  
+  carregarLocalStorage();
+
+  limparFormulario()
+
+  console.log(imc.toFixed(2))
+})
 
 
 
-
-
-
-
-
-
-
-
-
-
-  limparCampos();
-  console.log("Nome: " + nome.value);
-  console.log("IMC: " + imc.toFixed(2));
-
-  
-
-
-});
